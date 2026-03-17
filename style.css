@@ -85,8 +85,8 @@ ul { list-style: none; }
 
 .navbar.scrolled {
   background: rgba(13, 15, 20, 0.92);
-  backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
   padding: 0.8rem 0;
   box-shadow: 0 1px 30px rgba(0,0,0,0.5);
   border-bottom: 1px solid var(--clr-border);
@@ -238,6 +238,7 @@ ul { list-style: none; }
   padding: 0.45rem 1.2rem;
   border-radius: var(--radius-full);
   margin-bottom: 1.5rem;
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
 
@@ -305,6 +306,7 @@ ul { list-style: none; }
   border: 2px solid rgba(255,255,255,0.4);
   cursor: pointer;
   transition: all var(--transition);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
 }
 
@@ -554,6 +556,7 @@ ul { list-style: none; }
   position: absolute;
   top: 1rem; right: 1rem;
   background: rgba(13, 15, 20, 0.75);
+  -webkit-backdrop-filter: blur(10px);
   backdrop-filter: blur(10px);
   border: 1px solid var(--clr-border);
   color: var(--clr-primary);
@@ -880,8 +883,8 @@ ul { list-style: none; }
   transition: border-color var(--transition), box-shadow var(--transition);
   outline: none;
   resize: vertical;
-  appearance: none;
   -webkit-appearance: none;
+  appearance: none;
 }
 
 .form-group input::placeholder,

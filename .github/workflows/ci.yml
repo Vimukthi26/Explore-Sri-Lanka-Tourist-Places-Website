@@ -28,7 +28,8 @@ jobs:
         run: npx htmlhint index.html --rules "tag-pair=true,attr-value-not-empty=true,id-unique=true"
 
       - name: Run Stylelint
-        run: npx stylelint "**/*.css" --config-json '{"extends": ["stylelint-config-standard"]}'
+        run: |
+          npx stylelint "**/*.css" --config-json '{"extends": ["stylelint-config-standard"]}'
 
   deploy:
     name: Deploy to GitHub Pages Preview
