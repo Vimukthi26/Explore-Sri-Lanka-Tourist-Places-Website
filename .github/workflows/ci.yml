@@ -1,0 +1,49 @@
+name: Explore Sri Lanka CI/CD
+
+on:
+  push:
+    branches: [ "main", "dev" ]
+  pull_request:
+    branches: [ "main", "dev" ]
+
+jobs:
+  lint:
+    name: Lint & Validate Code
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Linting Tools
+        run: |
+          npm init -y
+          npm install --save-dev htmlhint stylelint stylelint-config-standard
+
+      - name: Run HTMLHint
+        run: npx htmlhint index.html --rules "tag-pair=true,attr-value-not-empty=true,id-unique=true"
+
+      - name: Run Stylelint
+        run: npx stylelint "**/*.css" --config-json '{"extends": ["stylelint-config-standard"]}'
+
+  deploy:
+    name: Deploy to GitHub Pages Preview
+    needs: lint
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
