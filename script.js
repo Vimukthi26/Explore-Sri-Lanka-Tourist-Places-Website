@@ -236,10 +236,15 @@
   handleCounterVisibility();
 
   // ---- Interactive Map Initialization ----
+  let mapInitialized = false;
   const initMap = () => {
+    if (mapInitialized) return;
     const mapEl = document.getElementById('map');
     if (!mapEl) return;
 
+    console.log("Initializing Explore Lanka Map...");
+    mapInitialized = true;
+    
     // Center map on Sri Lanka
     const map = L.map('map').setView([7.8731, 80.7718], 7);
 
