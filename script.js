@@ -235,4 +235,47 @@
   window.addEventListener('scroll', handleCounterVisibility, { passive: true });
   handleCounterVisibility();
 
+  // ---- Interactive Map Initialization ----
+  const initMap = () => {
+    const mapEl = document.getElementById('map');
+    if (!mapEl) return;
+
+    // Center map on Sri Lanka
+    const map = L.map('map').setView([7.8731, 80.7718], 7);
+
+    // Dark themed map tokens (matches premium site)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    // Filter markers from places cards
+    const locations = [
+      { name: 'Sigiriya Rock Fortress', coords: [7.9570, 80.7603], category: 'historical' },
+      { name: 'Temple of the Tooth', coords: [7.2936, 80.6413], category: 'historical' },
+      { name: 'Ella Nine Arch Bridge', coords: [6.8768, 81.0609], category: 'nature' },
+      { name: 'Galle Fort', coords: [6.0267, 80.2173], category: 'historical' },
+      { name: 'Mirissa Beach', coords: [5.9483, 80.4716], category: 'beach' },
+      { name: 'Nuwara Eliya', coords: [6.9497, 80.7891], category: 'nature' }
+    ];
+
+    locations.forEach(loc => {
+      const marker = L.marker(loc.coords).addTo(map);
+      marker.bindPopup(`<strong>${loc.name}</strong><br>${loc.category.charAt(0).toUpperCase() + loc.category.slice(1)}`);
+    });
+
+    // Add search control
+    const geocoder = L.Control.Geocoder.nominatim();
+    L.Control.geocoder({
+      defaultMarkGeocode: true,
+      placeholder: "Search places in SL...",
+      geocoder: geocoder
+    }).addTo(map);
+  };
+
+  // Run map init
+  document.addEventListener('DOMContentLoaded', initMap);
+  // Also run if mapEl is already there (in case of dynamic loads)
+  if (document.getElementById('map')) initMap();
+
 }());
