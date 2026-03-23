@@ -720,6 +720,34 @@ ul { list-style: none; }
 .stars { color: var(--clr-primary); font-size: 0.9rem; }
 .rating-text { font-size: 0.82rem; color: var(--clr-text-muted); font-weight: 500; }
 
+/* Real-time Weather Badge */
+.place-weather {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--clr-border);
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  transition: opacity 0.3s ease;
+}
+
+.w-icon {
+  font-size: 1.4rem;
+}
+
+.w-temp {
+  font-weight: 700;
+  color: var(--clr-primary);
+  font-size: 1.1rem;
+}
+
+.w-desc {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--clr-text-muted);
+}
+
 /* =====================================================
    GALLERY SECTION
    ===================================================== */
@@ -1141,3 +1169,9 @@ ul { list-style: none; }
     grid-auto-rows: 160px;
   }
 }
+
+/* Lightbox Animations */
+@keyframes lbFadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes lbZoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes lbFadeOut { from { opacity: 1; } to { opacity: 0; } }
+@keyframes lbZoomOut { from { transform: scale(1); opacity: 1; } to { transform: scale(0.9); opacity: 0; } }

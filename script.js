@@ -83,6 +83,18 @@
     });
   });
 
+  // ---- Destination Interaction ----
+  placeCards.forEach((card) => {
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', (e) => {
+      // Don't trigger if clicking the "Plan Visit" button
+      if (e.target.closest('.place-overlay-btn')) return;
+      
+      const id = card.id.replace('place-', '');
+      if (window.focusPlace) window.focusPlace(id);
+    });
+  });
+
   // ---- Contact Form Submission ----
   const contactForm = document.getElementById('contact-form');
   const formSuccess = document.getElementById('form-success');
@@ -155,41 +167,56 @@
     lb.id = 'lightbox';
     lb.style.cssText = `
       position: fixed; inset: 0; z-index: 9999;
-      background: rgba(0,0,0,0.92);
-      display: flex; align-items: center; justify-content: center;
-      opacity: 0; transition: opacity 0.3s ease;
+      background: rgba(13, 15, 20, 0.95);
+      backdrop-filter: blur(15px);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
       cursor: zoom-out;
+      animation: lbFadeIn 0.4s ease forwards;
     `;
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '&times;';
+    closeBtn.style.cssText = `
+      position: absolute; top: 2rem; right: 2rem;
+      background: none; border: none; color: #fff;
+      font-size: 3rem; cursor: pointer; opacity: 0.6;
+      transition: opacity 0.3s; z-index: 10000;
+      line-height: 1;
+    `;
+    closeBtn.addEventListener('mouseenter', () => closeBtn.style.opacity = '1');
+    closeBtn.addEventListener('mouseleave', () => closeBtn.style.opacity = '0.6');
+
     const img = document.createElement('img');
     img.style.cssText = `
-      max-width: 90vw; max-height: 90vh;
+      max-width: 85vw; max-height: 80vh;
       object-fit: contain;
-      border-radius: 12px;
-      box-shadow: 0 20px 80px rgba(0,0,0,0.8);
-      transform: scale(0.9); transition: transform 0.3s ease;
-      width: auto; height: auto;
+      border-radius: 16px;
+      box-shadow: 0 30px 100px rgba(0,0,0,0.9);
+      animation: lbZoomIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      border: 1px solid rgba(255,255,255,0.1);
     `;
+    
     const caption = document.createElement('p');
     caption.style.cssText = `
-      position: absolute; bottom: 2rem; left: 50%;
-      transform: translateX(-50%);
-      color: rgba(255,255,255,0.7); font-size: 0.9rem;
-      letter-spacing: 0.1em; text-align: center;
-      font-family: 'Inter', sans-serif;
+      margin-top: 2rem;
+      color: var(--clr-primary); font-size: 1.1rem;
+      letter-spacing: 0.05em; text-align: center;
+      font-family: var(--font-display);
+      font-weight: 700;
     `;
-    lb.append(img, caption);
+
+    lb.append(closeBtn, img, caption);
     document.body.appendChild(lb);
 
-    lb.addEventListener('click', () => {
-      lb.style.opacity = '0';
-      img.style.transform = 'scale(0.9)';
+    const closeLightbox = () => {
+      lb.style.animation = 'lbFadeOut 0.3s ease forwards';
+      img.style.animation = 'lbZoomOut 0.3s ease forwards';
       setTimeout(() => lb.remove(), 300);
-    });
+    };
 
-    setTimeout(() => {
-      lb.style.opacity = '1';
-      img.style.transform = 'scale(1)';
-    }, 10);
+    lb.addEventListener('click', (e) => {
+      if (e.target !== img) closeLightbox();
+    });
 
     return { lb, img, caption };
   };
@@ -237,6 +264,9 @@
 
   // ---- Interactive Map Initialization ----
   let mapInitialized = false;
+  let mainMap = null;
+  const mapMarkers = {};
+
   const initMap = () => {
     if (mapInitialized) return;
     const mapEl = document.getElementById('map');
@@ -246,27 +276,29 @@
     mapInitialized = true;
     
     // Center map on Sri Lanka
-    const map = L.map('map').setView([7.8731, 80.7718], 7);
+    mainMap = L.map('map').setView([7.8731, 80.7718], 7);
 
-    // Dark themed map tokens (matches premium site)
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    // Premium Dark themed map tiles (matched to site aesthetic)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
-      attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd'
+    }).addTo(mainMap);
 
     // Filter markers from places cards
     const locations = [
-      { name: 'Sigiriya Rock Fortress', coords: [7.9570, 80.7603], category: 'historical' },
-      { name: 'Temple of the Tooth', coords: [7.2936, 80.6413], category: 'historical' },
-      { name: 'Ella Nine Arch Bridge', coords: [6.8768, 81.0609], category: 'nature' },
-      { name: 'Galle Fort', coords: [6.0267, 80.2173], category: 'historical' },
-      { name: 'Mirissa Beach', coords: [5.9483, 80.4716], category: 'beach' },
-      { name: 'Nuwara Eliya', coords: [6.9497, 80.7891], category: 'nature' }
+      { id: 'sigiriya', name: 'Sigiriya Rock Fortress', coords: [7.9570, 80.7603], category: 'historical' },
+      { id: 'kandy', name: 'Temple of the Tooth', coords: [7.2936, 80.6413], category: 'historical' },
+      { id: 'ella', name: 'Ella Nine Arch Bridge', coords: [6.8768, 81.0609], category: 'nature' },
+      { id: 'galle', name: 'Galle Fort', coords: [6.0267, 80.2173], category: 'historical' },
+      { id: 'mirissa', name: 'Mirissa Beach', coords: [5.9483, 80.4716], category: 'beach' },
+      { id: 'tea', name: 'Nuwara Eliya', coords: [6.9497, 80.7891], category: 'nature' }
     ];
 
     locations.forEach(loc => {
-      const marker = L.marker(loc.coords).addTo(map);
+      const marker = L.marker(loc.coords).addTo(mainMap);
       marker.bindPopup(`<strong>${loc.name}</strong><br>${loc.category.charAt(0).toUpperCase() + loc.category.slice(1)}`);
+      mapMarkers[loc.id] = marker;
     });
 
     // Add search control
@@ -275,12 +307,80 @@
       defaultMarkGeocode: true,
       placeholder: "Search places in SL...",
       geocoder: geocoder
-    }).addTo(map);
+    }).addTo(mainMap);
+  };
+
+  // Helper to focus map on a specific place
+  window.focusPlace = (id) => {
+    const marker = mapMarkers[id];
+    if (marker && mainMap) {
+      mainMap.setView(marker.getLatLng(), 13);
+      marker.openPopup();
+      document.getElementById('map-wrap').scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   // Run map init
-  document.addEventListener('DOMContentLoaded', initMap);
+  document.addEventListener('DOMContentLoaded', () => {
+    initMap();
+    initWeather();
+  });
   // Also run if mapEl is already there (in case of dynamic loads)
-  if (document.getElementById('map')) initMap();
+  if (document.getElementById('map')) {
+    initMap();
+    initWeather();
+  }
+
+  // ---- Weather Integration ----
+  function initWeather() {
+    const weatherLocations = [
+      { id: 'sigiriya', lat: 7.9570, lon: 80.7603 },
+      { id: 'kandy', lat: 7.2936, lon: 80.6413 },
+      { id: 'ella', lat: 6.8768, lon: 81.0609 },
+      { id: 'galle', lat: 6.0267, baseId: 'galle', lon: 80.2173 },
+      { id: 'mirissa', lat: 5.9483, lon: 80.4716 },
+      { id: 'tea', lat: 6.9497, lon: 80.7891 } // Nuwara Eliya
+    ];
+
+    weatherLocations.forEach(loc => fetchWeather(loc));
+  }
+
+  async function fetchWeather(loc) {
+    const el = document.getElementById(`weather-${loc.id}`);
+    if (!el) return;
+
+    try {
+      const resp = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&current=temperature_2m,weather_code`);
+      const data = await resp.json();
+      
+      const temp = Math.round(data.current.temperature_2m);
+      const code = data.current.weather_code;
+      const info = getWeatherInfo(code);
+
+      el.querySelector('.w-icon').textContent = info.icon;
+      el.querySelector('.w-temp').textContent = `${temp}°C`;
+      el.querySelector('.w-desc').textContent = info.desc;
+      el.style.opacity = '1';
+    } catch (err) {
+      console.error("Weather error:", err);
+      el.querySelector('.w-desc').textContent = "Unavailable";
+    }
+  }
+
+  function getWeatherInfo(code) {
+    const codes = {
+      0: { icon: '☀️', desc: 'Clear' },
+      1: { icon: '🌤️', desc: 'Mainly Clear' },
+      2: { icon: '⛅', desc: 'Partly Cloudy' },
+      3: { icon: '☁️', desc: 'Overcast' },
+      45: { icon: '🌫️', desc: 'Fog' },
+      48: { icon: '🌫️', desc: 'Fog' },
+      51: { icon: '🌦️', desc: 'Drizzle' },
+      61: { icon: '🌧️', desc: 'Rain' },
+      80: { icon: '🌦️', desc: 'Showers' },
+      95: { icon: '⛈️', desc: 'Thunderstorm' }
+    };
+    return codes[code] || { icon: '️⛅', desc: 'Cloudy' };
+  }
 
 }());
