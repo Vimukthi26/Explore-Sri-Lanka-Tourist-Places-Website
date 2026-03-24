@@ -311,14 +311,9 @@
     const sriLankaGeocoder = {
       geocode: async function(query) {
         try {
-          // Sequentially try highly specific searches, returning immediately on first success
-          let results = await baseGeocoder.geocode(query + " tourism Sri Lanka");
-          if (!results || results.length === 0) {
-            results = await baseGeocoder.geocode(query + " temple Sri Lanka");
-          }
-          if (!results || results.length === 0) {
-            results = await baseGeocoder.geocode(query + " Sri Lanka");
-          }
+          // Append Sri Lanka to restrict search natively without breaking Nominatim's strict matching
+          const q = query.toLowerCase().includes('sri lanka') ? query : query + " Sri Lanka";
+          let results = await baseGeocoder.geocode(q);
           return results || [];
         } catch(e) {
           console.error("Geocoding failed:", e);
