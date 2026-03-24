@@ -305,13 +305,30 @@
       mapMarkers[loc.id] = marker;
     });
 
-    // Fast geocoder restricted to Sri Lanka
-    const sriLankaGeocoder = L.Control.Geocoder.nominatim({
-      geocodingQueryParams: {
-        countrycodes: 'lk',
-        limit: 6
+    // Safe geocoder wrapper (avoids CORS issues on local files by not overriding default Nominatim params)
+    const baseGeocoder = L.Control.Geocoder.nominatim();
+
+    const sriLankaGeocoder = {
+      geocode: async function(query) {
+        try {
+          // Sequentially try highly specific searches, returning immediately on first success
+          let results = await baseGeocoder.geocode(query + " tourism Sri Lanka");
+          if (!results || results.length === 0) {
+            results = await baseGeocoder.geocode(query + " temple Sri Lanka");
+          }
+          if (!results || results.length === 0) {
+            results = await baseGeocoder.geocode(query + " Sri Lanka");
+          }
+          return results || [];
+        } catch(e) {
+          console.error("Geocoding failed:", e);
+          return [];
+        }
+      },
+      suggest: async function(query) {
+        return this.geocode(query);
       }
-    });
+    };
 
     L.Control.geocoder({
       defaultMarkGeocode: true,
