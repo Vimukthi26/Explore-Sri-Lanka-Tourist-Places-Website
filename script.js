@@ -275,8 +275,12 @@
     console.log("Initializing Explore Lanka Map...");
     mapInitialized = true;
     
-    // Center map on Sri Lanka
-    mainMap = L.map('map').setView([7.8731, 80.7718], 7);
+    // Center map on Sri Lanka, disable scroll wheel zoom by default
+    mainMap = L.map('map', { scrollWheelZoom: false }).setView([7.8731, 80.7718], 7);
+
+    // Enable scroll zoom on click, disable when mouse leaves
+    mainMap.on('click', () => mainMap.scrollWheelZoom.enable());
+    mainMap.on('mouseout', () => mainMap.scrollWheelZoom.disable());
 
     // Premium Dark themed map tiles (matched to site aesthetic)
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
