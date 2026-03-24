@@ -551,16 +551,64 @@ ul { list-style: none; }
   z-index: 10;
 }
 
-/* Custom Marker Styling */
+/* Navy-Blue & Radium Map Overlay */
+.leaflet-tile-pane {
+  filter: sepia(100%) hue-rotate(185deg) saturate(350%) contrast(110%) brightness(85%);
+}
+
+/* Premium Radium-Themed Marker Popup Styling */
 .leaflet-popup-content-wrapper {
-  background: var(--clr-surface-2);
-  color: var(--clr-text);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--clr-border);
+  background: rgba(10, 15, 25, 0.9) !important;
+  backdrop-filter: blur(12px) !important;
+  color: #e0f7fa !important;
+  border-radius: 12px !important;
+  border: 1px solid rgba(0, 255, 255, 0.35) !important;
+  box-shadow: 0 0 25px rgba(0, 255, 255, 0.15), inset 0 0 10px rgba(0, 255, 255, 0.1) !important;
+  padding: 2px !important;
+  font-family: var(--font-body) !important;
+  transition: all 0.3s ease;
+}
+
+.leaflet-popup-content {
+  margin: 14px 20px !important;
+  line-height: 1.6 !important;
+  font-size: 0.95rem !important;
+}
+
+.leaflet-popup-content strong {
+  color: #00ffff !important; /* Radium Color */
+  font-size: 1.15rem !important;
+  font-family: var(--font-display) !important;
+  letter-spacing: 0.05em;
+  display: block;
+  margin-bottom: 5px;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+}
+
+.leaflet-popup-tip-container {
+  overflow: visible !important;
 }
 
 .leaflet-popup-tip {
-  background: var(--clr-surface-2);
+  background: rgba(10, 15, 25, 0.9) !important;
+  border-left: 1px solid rgba(0, 255, 255, 0.35) !important;
+  border-top: 1px solid rgba(0, 255, 255, 0.35) !important;
+  box-shadow: -2px -2px 10px rgba(0, 255, 255, 0.1) !important;
+}
+
+.leaflet-popup-close-button {
+  color: #00ffff !important;
+  font-size: 1.4rem !important;
+  font-weight: 300 !important;
+  padding: 6px 10px !important;
+  transition: all 0.3s ease !important;
+}
+
+.leaflet-popup-close-button:hover {
+  color: #fff !important;
+  background: transparent !important;
+  text-shadow: 0 0 8px #00ffff !important;
+  transform: scale(1.1);
 }
 
 .leaflet-control-zoom a {
