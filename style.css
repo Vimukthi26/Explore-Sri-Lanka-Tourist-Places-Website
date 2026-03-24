@@ -563,22 +563,59 @@ ul { list-style: none; }
   background: var(--clr-surface-2);
 }
 
-.leaflet-control-zoom a,
-.leaflet-control-geocoder-icon {
+.leaflet-control-zoom a {
   background-color: var(--clr-surface-2) !important;
   color: var(--clr-primary) !important;
   border: 1px solid var(--clr-border) !important;
 }
 
+/* Premium Light Geocoder (Search Bar) UI */
+.leaflet-control-geocoder {
+  border-radius: 8px !important;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
+  border: none !important;
+}
+
+.leaflet-control-geocoder-icon {
+  background-color: #ffffff !important;
+  color: #333 !important;
+  border: none !important;
+  border-radius: 8px !important;
+}
+
+.leaflet-control-geocoder-icon:hover {
+  background-color: #f0f0f0 !important;
+}
+
 .leaflet-control-geocoder-form input {
-  background: var(--clr-bg-3) !important;
-  color: var(--clr-text) !important;
-  border: 1px solid var(--clr-border) !important;
+  background: #ffffff !important;
+  color: #222 !important;
+  border: none !important;
+  font-family: var(--font-body) !important;
+  font-size: 0.9rem !important;
+  padding: 0 10px 0 5px !important;
+}
+
+.leaflet-control-geocoder-form input::placeholder {
+  color: #777 !important;
 }
 
 .leaflet-control-geocoder-alternatives {
-  background: var(--clr-surface-2) !important;
-  color: var(--clr-text) !important;
+  background: #ffffff !important;
+  color: #222 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.2) !important;
+  margin-top: 8px !important;
+  border: 1px solid #e0e0e0 !important;
+}
+
+.leaflet-control-geocoder-alternatives li {
+  border-bottom: 1px solid #f0f0f0 !important;
+  padding: 8px 12px !important;
+}
+
+.leaflet-control-geocoder-alternatives li:hover {
+  background-color: #f9f9f9 !important;
 }
 
 .leaflet-bar a:hover {
