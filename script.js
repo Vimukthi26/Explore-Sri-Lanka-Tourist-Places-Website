@@ -301,12 +301,40 @@
       mapMarkers[loc.id] = marker;
     });
 
-    // Add search control
-    const geocoder = L.Control.Geocoder.nominatim();
+    // Custom geocoder to focus on Sri Lanka tourism and sacred places
+    const nominatim = L.Control.Geocoder.nominatim({
+      geocodingQueryParams: {
+        countrycodes: 'lk',
+        limit: 5
+      }
+    });
+
+    const customGeocoder = {
+      geocode: function(query, cb, context) {
+        // First try searching with 'tourism' appended
+        nominatim.geocode(query + ' tourism', function(res1) {
+          if (res1 && res1.length > 0) {
+            cb.call(context, res1);
+          } else {
+            // Then try with 'temple'
+            nominatim.geocode(query + ' temple', function(res2) {
+              if (res2 && res2.length > 0) {
+                cb.call(context, res2);
+              } else {
+                // Fallback to the original query
+                nominatim.geocode(query, cb, context);
+              }
+            }, context);
+          }
+        }, context);
+      },
+      reverse: nominatim.reverse ? nominatim.reverse.bind(nominatim) : null
+    };
+
     L.Control.geocoder({
       defaultMarkGeocode: true,
-      placeholder: "Search places in SL...",
-      geocoder: geocoder
+      placeholder: "Search tourism & sacred places...",
+      geocoder: customGeocoder
     }).addTo(mainMap);
   };
 
