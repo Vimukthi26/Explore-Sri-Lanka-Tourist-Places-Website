@@ -302,7 +302,7 @@
     });
 
     // Custom geocoder to focus on Sri Lanka tourism and sacred places
-    const nominatim = L.Control.Geocoder.nominatim({
+    const baseGeocoder = L.Control.Geocoder.nominatim({
       geocodingQueryParams: {
         countrycodes: 'lk',
         limit: 5
@@ -310,25 +310,39 @@
     });
 
     const customGeocoder = {
-      geocode: function(query, cb, context) {
-        // First try searching with 'tourism' appended
-        nominatim.geocode(query + ' tourism', function(res1) {
-          if (res1 && res1.length > 0) {
-            cb.call(context, res1);
-          } else {
-            // Then try with 'temple'
-            nominatim.geocode(query + ' temple', function(res2) {
-              if (res2 && res2.length > 0) {
-                cb.call(context, res2);
-              } else {
-                // Fallback to the original query
-                nominatim.geocode(query, cb, context);
-              }
-            }, context);
-          }
-        }, context);
+      geocode: async function(query) {
+        try {
+          // Query simultaneously for exact location, tourism, and temples in the area
+          const [places, tourism, temples] = await Promise.all([
+            baseGeocoder.geocode(query),
+            baseGeocoder.geocode(query + ' tourism'),
+            baseGeocoder.geocode(query + ' temple')
+          ]);
+          
+          let allResults = [];
+          if (tourism) allResults.push(...tourism);
+          if (temples) allResults.push(...temples);
+          if (places) allResults.push(...places);
+          
+          // Deduplicate by name and coordinates
+          let unique = [];
+          let seen = new Set();
+          allResults.forEach(r => {
+            let key = r.name + (r.center ? r.center.lat : '');
+            if (!seen.has(key)) {
+              seen.add(key);
+              unique.push(r);
+            }
+          });
+          return unique.slice(0, 7);
+        } catch(e) {
+          console.error("Geocoding error:", e);
+          return baseGeocoder.geocode(query);
+        }
       },
-      reverse: nominatim.reverse ? nominatim.reverse.bind(nominatim) : null
+      suggest: async function(query) {
+        return this.geocode(query);
+      }
     };
 
     L.Control.geocoder({
