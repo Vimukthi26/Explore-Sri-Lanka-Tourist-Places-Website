@@ -309,19 +309,22 @@
     const baseGeocoder = L.Control.Geocoder.nominatim();
 
     const sriLankaGeocoder = {
-      geocode: async function(query) {
-        try {
-          // Append Sri Lanka to restrict search natively without breaking Nominatim's strict matching
-          const q = query.toLowerCase().includes('sri lanka') ? query : query + " Sri Lanka";
-          let results = await baseGeocoder.geocode(q);
-          return results || [];
-        } catch(e) {
-          console.error("Geocoding failed:", e);
-          return [];
+      geocode: function(query, cb, context) {
+        const q = query.toLowerCase().includes('sri lanka') ? query : query + " Sri Lanka";
+        baseGeocoder.geocode(q, cb, context);
+      },
+      suggest: function(query, cb, context) {
+        const q = query.toLowerCase().includes('sri lanka') ? query : query + " Sri Lanka";
+        if (baseGeocoder.suggest) {
+          baseGeocoder.suggest(q, cb, context);
+        } else {
+          baseGeocoder.geocode(q, cb, context);
         }
       },
-      suggest: async function(query) {
-        return this.geocode(query);
+      reverse: function(location, scale, cb, context) {
+        if (baseGeocoder.reverse) {
+          baseGeocoder.reverse(location, scale, cb, context);
+        }
       }
     };
 
