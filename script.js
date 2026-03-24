@@ -305,8 +305,8 @@
       mapMarkers[loc.id] = marker;
     });
 
-    // Safe geocoder wrapper (avoids CORS issues on local files by not overriding default Nominatim params)
-    const baseGeocoder = L.Control.Geocoder.nominatim();
+    // Safe geocoder wrapper using Photon API (bypasses local CORS issues while remaining highly accurate)
+    const baseGeocoder = L.Control.Geocoder.photon();
 
     const sriLankaGeocoder = {
       geocode: function(query, cb, context) {
