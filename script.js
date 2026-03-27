@@ -296,7 +296,9 @@
       { id: 'ella', name: 'Ella Nine Arch Bridge', coords: [6.8768, 81.0609], category: 'nature' },
       { id: 'galle', name: 'Galle Fort', coords: [6.0267, 80.2173], category: 'historical' },
       { id: 'mirissa', name: 'Mirissa Beach', coords: [5.9483, 80.4716], category: 'beach' },
-      { id: 'tea', name: 'Nuwara Eliya', coords: [6.9497, 80.7891], category: 'nature' }
+      { id: 'tea', name: 'Nuwara Eliya', coords: [6.9497, 80.7891], category: 'nature' },
+      { id: 'anuradhapura', name: 'Anuradhapura', coords: [8.3122, 80.4131], category: 'historical' },
+      { id: 'yala', name: 'Yala National Park', coords: [6.3981, 81.3323], category: 'nature' }
     ];
 
     locations.forEach(loc => {
@@ -328,12 +330,93 @@
       }
     };
 
-    L.Control.geocoder({
-      defaultMarkGeocode: true,
+    const geocoderControl = L.Control.geocoder({
+      defaultMarkGeocode: false, // We'll handle it manually for cooler effects
       placeholder: "Search tourism & sacred places...",
       geocoder: sriLankaGeocoder
     }).addTo(mainMap);
+
+    // Group for suggestion markers so we can clear them easily
+    const suggestionGroup = L.layerGroup().addTo(mainMap);
+
+    geocoderControl.on('markgeocode', function(e) {
+      const center = e.geocode.center;
+      const name = e.geocode.name;
+      
+      // Clear previous suggestions
+      suggestionGroup.clearLayers();
+      
+      // Center and add main result marker
+      mainMap.setView(center, 14);
+      L.marker(center)
+        .addTo(suggestionGroup)
+        .bindPopup(`<strong>${name}</strong><br>Search Result`)
+        .openPopup();
+
+      // Fetch nearby suggestions (within 5km)
+      fetchNearbySuggestions(center.lat, center.lng, suggestionGroup);
+    });
   };
+
+  /**
+   * Fetches nearby tourist and religious sites using Overpass API
+   */
+  async function fetchNearbySuggestions(lat, lon, layerGroup) {
+    console.log(`Fetching nearby attractions for ${lat}, ${lon}...`);
+    
+    // Overpass API Query: find tourism or places of worship within 5000m
+    const query = `[out:json];
+      (
+        node(around:5000, ${lat}, ${lon})["tourism"];
+        node(around:5000, ${lat}, ${lon})["amenity"="place_of_worship"];
+        way(around:5000, ${lat}, ${lon})["tourism"];
+        way(around:5000, ${lat}, ${lon})["amenity"="place_of_worship"];
+      );
+      out center;`;
+    
+    const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
+
+    try {
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      if (!data.elements || data.elements.length === 0) return;
+
+      // Filter and limit results
+      const results = data.elements
+        .filter(el => el.tags && (el.tags.name)) // Must have a name
+        .slice(0, 8); // Max 8 suggestions
+
+      results.forEach(item => {
+        const itemLat = item.lat || (item.center && item.center.lat);
+        const itemLon = item.lon || (item.center && item.center.lon);
+        const itemName = item.tags.name;
+        const itemType = item.tags.tourism || item.tags.amenity || 'Point of Interest';
+
+        if (itemLat && itemLon) {
+          // Add a special "Suggestion" marker
+          const suggestionMarker = L.circleMarker([itemLat, itemLon], {
+            radius: 8,
+            fillColor: "#00ffff",
+            color: "#fff",
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.8
+          }).addTo(layerGroup);
+
+          suggestionMarker.bindPopup(`
+            <div style="text-align: center;">
+              <small style="color: #00ffff; text-transform: uppercase; font-weight: 700;">Suggested Place</small>
+              <h4 style="margin: 5px 0; color: #fff; font-family: var(--font-display);">${itemName}</h4>
+              <p style="margin: 0; font-size: 0.8rem; color: #aaa;">${itemType.replace('_', ' ')}</p>
+            </div>
+          `);
+        }
+      });
+    } catch (error) {
+      console.error("Error fetching nearby suggestions:", error);
+    }
+  }
 
   // Helper to focus map on a specific place
   window.focusPlace = (id) => {
@@ -364,7 +447,9 @@
       { id: 'ella', lat: 6.8768, lon: 81.0609 },
       { id: 'galle', lat: 6.0267, baseId: 'galle', lon: 80.2173 },
       { id: 'mirissa', lat: 5.9483, lon: 80.4716 },
-      { id: 'tea', lat: 6.9497, lon: 80.7891 } // Nuwara Eliya
+      { id: 'tea', lat: 6.9497, lon: 80.7891 }, // Nuwara Eliya
+      { id: 'anuradhapura', lat: 8.3122, lon: 80.4131 },
+      { id: 'yala', lat: 6.3981, lon: 81.3323 }
     ];
 
     weatherLocations.forEach(loc => fetchWeather(loc));
