@@ -505,6 +505,7 @@
     initItineraryBuilder();
     initCurrencyConverter();
     initTravelQuiz();
+    initInstantSearch();
   }
 
   // Run initializations
@@ -1020,6 +1021,116 @@
 
     // Scroll to places grid
     document.getElementById('places').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function initInstantSearch() {
+    const searchInput = document.getElementById('map-instant-search');
+    const dropdown = document.getElementById('search-autocomplete-dropdown');
+    if (!searchInput || !dropdown) return;
+
+    let debounceTimeout;
+
+    searchInput.addEventListener('input', (e) => {
+      const val = e.target.value.trim().toLowerCase();
+      clearTimeout(debounceTimeout);
+
+      if (!val) {
+        dropdown.innerHTML = '';
+        dropdown.classList.remove('open');
+        return;
+      }
+
+      // 1. Filter local places
+      const localMatches = [];
+      Object.keys(destinationCoords).forEach(id => {
+        const dest = destinationCoords[id];
+        if (dest.name.toLowerCase().includes(val) || dest.category.toLowerCase().includes(val)) {
+          localMatches.push({ id, ...dest, isLocal: true });
+        }
+      });
+
+      renderSuggestions(localMatches);
+
+      // 2. Fetch external places from Photon API (debounced to avoid spamming Nominatim)
+      debounceTimeout = setTimeout(async () => {
+        try {
+          const query = encodeURIComponent(val + " Sri Lanka");
+          const resp = await fetch(`https://photon.komoot.io/api/?q=${query}&limit=5`);
+          const data = await resp.json();
+          
+          if (data && data.features) {
+            const externalMatches = data.features.map(f => {
+              const name = f.properties.name || f.properties.city || f.properties.state || 'Scenic Location';
+              const details = [f.properties.city, f.properties.state, f.properties.country].filter(Boolean).join(', ');
+              return {
+                name,
+                coords: [f.geometry.coordinates[1], f.geometry.coordinates[0]],
+                desc: details,
+                category: f.properties.osm_value || 'Tourism Place',
+                isLocal: false
+              };
+            }).filter(ext => {
+              // Filter duplicates against local matches
+              return !localMatches.some(loc => loc.name.toLowerCase().includes(ext.name.toLowerCase()));
+            });
+
+            renderSuggestions([...localMatches, ...externalMatches]);
+          }
+        } catch (err) {
+          console.error("Photon autocomplete error:", err);
+        }
+      }, 300);
+    });
+
+    function renderSuggestions(matches) {
+      if (matches.length === 0) {
+        dropdown.innerHTML = '<div class="autocomplete-item" style="cursor: default;"><span class="autocomplete-title">No locations found 📍</span></div>';
+        dropdown.classList.add('open');
+        return;
+      }
+
+      dropdown.innerHTML = '';
+      matches.forEach(match => {
+        const item = document.createElement('div');
+        item.className = 'autocomplete-item';
+        
+        const tagClass = match.isLocal ? 'local' : 'external';
+        const tagText = match.isLocal ? '★ Featured Stop' : '🌍 Sri Lanka Map';
+
+        item.innerHTML = `
+          <span class="autocomplete-title">${match.name}</span>
+          <span class="autocomplete-desc">${match.desc || match.category}</span>
+          <span class="autocomplete-tag ${tagClass}">${tagText}</span>
+        `;
+
+        item.addEventListener('click', () => {
+          if (match.isLocal) {
+            window.focusPlace(match.id);
+          } else {
+            // Dynamically mount external marker on map
+            if (mainMap) {
+              mainMap.setView(match.coords, 14);
+              const extMarker = L.marker(match.coords).addTo(mainMap);
+              extMarker.bindPopup(`<strong>${match.name}</strong><br>${match.desc || 'Scenic spot in Sri Lanka'}`).openPopup();
+            }
+            document.getElementById('map-wrap').scrollIntoView({ behavior: 'smooth' });
+          }
+          searchInput.value = '';
+          dropdown.innerHTML = '';
+          dropdown.classList.remove('open');
+        });
+
+        dropdown.appendChild(item);
+      });
+      dropdown.classList.add('open');
+    }
+
+    // Hide dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.classList.remove('open');
+      }
+    });
   }
 
 }());

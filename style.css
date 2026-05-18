@@ -1976,3 +1976,120 @@ ul { list-style: none; }
   width: 14px !important;
   height: 14px !important;
 }
+
+/* =====================================================
+   Map Instant Autocomplete Search Styling
+   ===================================================== */
+.map-search-container {
+  position: relative;
+  min-width: 320px;
+}
+
+#map-instant-search {
+  width: 100%;
+  background: rgba(25, 25, 30, 0.75) !important;
+  border: 1px solid rgba(0, 255, 255, 0.25) !important;
+  border-radius: var(--radius-md) !important;
+  padding: 0.7rem 1rem 0.7rem 2.6rem !important;
+  color: #ffffff !important;
+  font-family: var(--font-body), sans-serif !important;
+  font-size: 0.88rem !important;
+  outline: none !important;
+  transition: all 0.3s ease !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+}
+
+#map-instant-search:focus {
+  border-color: #00ffff !important;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3) !important;
+  background: rgba(20, 20, 25, 0.9) !important;
+}
+
+.map-search-container::before {
+  content: '🔍';
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.95rem;
+  opacity: 0.7;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.search-autocomplete-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  background: rgba(20, 20, 25, 0.98) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 255, 255, 0.3) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.65) !important;
+  max-height: 280px;
+  overflow-y: auto;
+  z-index: 2000 !important;
+  display: none;
+}
+
+.search-autocomplete-dropdown.open {
+  display: block;
+}
+
+.autocomplete-item {
+  padding: 0.8rem 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  align-items: flex-start;
+}
+
+.autocomplete-item:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-item:hover {
+  background: rgba(0, 255, 255, 0.08) !important;
+}
+
+.autocomplete-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.autocomplete-desc {
+  font-size: 0.74rem;
+  color: var(--clr-text-muted);
+  text-align: left;
+}
+
+.autocomplete-tag {
+  align-self: flex-start;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-top: 0.2rem;
+}
+
+.autocomplete-tag.local {
+  background: rgba(0, 255, 255, 0.15);
+  color: #00ffff;
+  border: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+.autocomplete-tag.external {
+  background: rgba(200, 164, 94, 0.15);
+  color: var(--clr-primary);
+  border: 1px solid rgba(200, 164, 94, 0.3);
+}
