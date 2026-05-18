@@ -519,7 +519,7 @@ ul { list-style: none; }
   background: var(--clr-surface);
   border: 1px solid var(--clr-border);
   border-radius: var(--radius-lg);
-  overflow: hidden;
+  overflow: visible;
   margin-bottom: 3rem;
   box-shadow: var(--shadow-soft);
 }
@@ -549,10 +549,13 @@ ul { list-style: none; }
   height: 450px;
   width: 100%;
   z-index: 10;
+  border-bottom-left-radius: var(--radius-lg);
+  border-bottom-right-radius: var(--radius-lg);
+  overflow: hidden;
 }
 
-/* Navy-Blue & Radium Map Overlay */
-.leaflet-tile-pane {
+/* Navy-Blue & Radium Map Overlay - Only applied to Dark Map theme */
+#map:not(.original-colors) .leaflet-tile-pane {
   filter: sepia(100%) hue-rotate(185deg) saturate(350%) contrast(110%) brightness(85%);
 }
 

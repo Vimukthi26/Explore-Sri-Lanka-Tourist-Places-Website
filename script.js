@@ -335,6 +335,18 @@
     // Add Layer Control Panel to map (non-collapsed, perfectly accessible)
     L.control.layers(baseMaps, overlayMaps, { collapsed: false, position: 'topright' }).addTo(mainMap);
 
+    // Set initial colors to original (since OSM standard is loaded by default)
+    mapEl.classList.add('original-colors');
+
+    // Toggle color filters dynamically on layer selection
+    mainMap.on('baselayerchange', function(e) {
+      if (e.name === "Sleek Dark Map 🖤") {
+        mapEl.classList.remove('original-colors');
+      } else {
+        mapEl.classList.add('original-colors');
+      }
+    });
+
     // Filter markers from places cards
     const locations = [
       { id: 'sigiriya', name: 'Sigiriya Rock Fortress', coords: [7.9570, 80.7603], category: 'historical' },
