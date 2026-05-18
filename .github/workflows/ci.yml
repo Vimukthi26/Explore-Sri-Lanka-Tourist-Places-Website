@@ -3,42 +3,32 @@ name: Explore Sri Lanka CI/CD
 on:
   push:
     branches: [ "main", "dev" ]
-  pull_request:
-    branches: [ "main", "dev" ]
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
-  lint:
-    name: Lint & Validate Code
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install Linting Tools
-        run: |
-          npm init -y
-          npm install --save-dev htmlhint stylelint stylelint-config-standard
-
-      - name: Run HTMLHint
-        run: npx htmlhint index.html --rules "tag-pair=true,attr-value-not-empty=true,id-unique=true"
-
-      - name: Run Stylelint
-        run: |
-          npx stylelint "**/*.css" --config-json '{"extends": ["stylelint-config-standard"]}'
-
   deploy:
-    name: Deploy to GitHub Pages Preview
-    needs: lint
-    if: github.ref == 'refs/heads/main'
+    name: Deploy to GitHub Pages
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
