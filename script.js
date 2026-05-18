@@ -687,6 +687,72 @@
 
     if (!amtInput || !fromSelect || !toSelect || !resEl || !rtEl) return;
 
+    // Rich Dictionary containing currency codes, details, names, and flag emojis
+    const currencyDetails = {
+      LKR: { name: 'LKR - Sri Lankan Rupee 🇱🇰', symbol: 'Rs' },
+      USD: { name: 'USD - US Dollar 🇺🇸', symbol: '$' },
+      EUR: { name: 'EUR - Euro 🇪🇺', symbol: '€' },
+      GBP: { name: 'GBP - British Pound 🇬🇧', symbol: '£' },
+      AUD: { name: 'AUD - Australian Dollar 🇦🇺', symbol: 'A$' },
+      JPY: { name: 'JPY - Japanese Yen 🇯🇵', symbol: '¥' },
+      INR: { name: 'INR - Indian Rupee 🇮🇳', symbol: '₹' },
+      CAD: { name: 'CAD - Canadian Dollar 🇨🇦', symbol: 'C$' },
+      CHF: { name: 'CHF - Swiss Franc 🇨🇭', symbol: 'CHF' },
+      CNY: { name: 'CNY - Chinese Yuan 🇨🇳', symbol: '¥' },
+      NZD: { name: 'NZD - New Zealand Dollar 🇳🇿', symbol: 'NZ$' },
+      SGD: { name: 'SGD - Singapore Dollar 🇸🇬', symbol: 'S$' },
+      HKD: { name: 'HKD - Hong Kong Dollar 🇭🇰', symbol: 'HK$' },
+      SEK: { name: 'SEK - Swedish Krona 🇸🇪', symbol: 'kr' },
+      NOK: { name: 'NOK - Norwegian Krone 🇳🇴', symbol: 'kr' },
+      DKK: { name: 'DKK - Danish Krone 🇩🇰', symbol: 'kr' },
+      AED: { name: 'AED - UAE Dirham 🇦🇪', symbol: 'Dh' },
+      SAR: { name: 'SAR - Saudi Riyal 🇸🇦', symbol: 'SR' },
+      QAR: { name: 'QAR - Qatari Riyal 🇶🇦', symbol: 'QR' },
+      OMR: { name: 'OMR - Omani Rial 🇴🇲', symbol: 'RO' },
+      BHD: { name: 'BHD - Bahraini Dinar 🇧🇭', symbol: 'BD' },
+      KWD: { name: 'KWD - Kuwaiti Dinar 🇰🇼', symbol: 'KD' },
+      MYR: { name: 'MYR - Malaysian Ringgit 🇲🇾', symbol: 'RM' },
+      THB: { name: 'THB - Thai Baht 🇹🇭', symbol: '฿' },
+      PHP: { name: 'PHP - Philippine Peso 🇵🇭', symbol: '₱' },
+      IDR: { name: 'IDR - Indonesian Rupiah 🇮🇩', symbol: 'Rp' },
+      KRW: { name: 'KRW - South Korean Won 🇰🇷', symbol: '₩' },
+      RUB: { name: 'RUB - Russian Ruble 🇷🇺', symbol: '₽' },
+      ZAR: { name: 'ZAR - South African Rand 🇿🇦', symbol: 'R' },
+      BRL: { name: 'BRL - Brazilian Real 🇧🇷', symbol: 'R$' },
+      MXN: { name: 'MXN - Mexican Peso 🇲🇽', symbol: '$' },
+      TRY: { name: 'TRY - Turkish Lira 🇹🇷', symbol: '₺' }
+    };
+
+    // Helper to populate select elements dynamically
+    function populateDropdowns(rates) {
+      // Keep track of current values to restore them
+      const prevFrom = fromSelect.value || 'USD';
+      const prevTo = toSelect.value || 'LKR';
+
+      fromSelect.innerHTML = '';
+      toSelect.innerHTML = '';
+
+      const codes = Object.keys(rates).sort();
+
+      codes.forEach(code => {
+        const details = currencyDetails[code] || { name: `${code} - ${code} 🌍`, symbol: code };
+        
+        const optFrom = document.createElement('option');
+        optFrom.value = code;
+        optFrom.textContent = details.name;
+        fromSelect.appendChild(optFrom);
+
+        const optTo = document.createElement('option');
+        optTo.value = code;
+        optTo.textContent = details.name;
+        toSelect.appendChild(optTo);
+      });
+
+      // Restore selections safely
+      fromSelect.value = rates[prevFrom] ? prevFrom : 'USD';
+      toSelect.value = rates[prevTo] ? prevTo : 'LKR';
+    }
+
     // Fetch dynamic rates
     try {
       const resp = await fetch('https://open.er-api.com/v6/latest/USD');
@@ -694,6 +760,7 @@
       
       if (data && data.rates) {
         liveExchangeRates = data.rates;
+        populateDropdowns(liveExchangeRates);
         rtEl.textContent = `Live exchange rates loaded.`;
         performConversion();
       }
@@ -703,13 +770,14 @@
       
       liveExchangeRates = {
         USD: 1.0,
-        LKR: 300.0, // Fallback conversion
+        LKR: 300.0,
         EUR: 0.92,
         GBP: 0.79,
         AUD: 1.51,
         JPY: 156.0,
         INR: 83.5
       };
+      populateDropdowns(liveExchangeRates);
       performConversion();
     }
 
@@ -730,25 +798,25 @@
     function performConversion() {
       const amt = parseFloat(amtInput.value);
       const toCur = toSelect.value;
+      const fromCur = fromSelect.value;
+
       if (isNaN(amt) || amt <= 0) {
         resEl.textContent = `-- ${toCur}`;
         return;
       }
-
-      const fromCur = fromSelect.value;
 
       if (!liveExchangeRates[fromCur] || !liveExchangeRates[toCur]) return;
 
       const amtInUSD = amt / liveExchangeRates[fromCur];
       const converted = amtInUSD * liveExchangeRates[toCur];
 
-      const syms = { USD: '$', EUR: '€', GBP: '£', AUD: 'A$', JPY: '¥', INR: '₹', LKR: 'Rs' };
-      const toSym = syms[toCur] || '';
+      const details = currencyDetails[toCur];
+      const toSym = details ? details.symbol : toCur;
 
       resEl.textContent = `${toSym} ${converted.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
       const liveRate = liveExchangeRates[toCur] / liveExchangeRates[fromCur];
-      rtEl.textContent = `1 ${fromCur} = ${liveRate.toFixed(4)} ${toCur}`;
+      rtEl.textContent = `1 ${fromCur} = ${liveRate.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 4 })} ${toCur}`;
     }
   }
 
