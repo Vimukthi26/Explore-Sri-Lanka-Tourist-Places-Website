@@ -135,11 +135,14 @@
         Hand-picked destinations that showcase the very best of Sri Lanka's breathtaking beauty.
       </p>
 
-      <div class="filter-bar" id="filter-bar">
-        <button class="filter-btn active" data-filter="all" id="filter-all">All</button>
-        <button class="filter-btn" data-filter="historical" id="filter-historical">Historical</button>
-        <button class="filter-btn" data-filter="beach" id="filter-beach">Beaches</button>
-        <button class="filter-btn" data-filter="nature" id="filter-nature">Nature</button>
+      <div class="filter-bar-row">
+        <div class="filter-bar" id="filter-bar">
+          <button class="filter-btn active" data-filter="all" id="filter-all">All</button>
+          <button class="filter-btn" data-filter="historical" id="filter-historical">Historical</button>
+          <button class="filter-btn" data-filter="beach" id="filter-beach">Beaches</button>
+          <button class="filter-btn" data-filter="nature" id="filter-nature">Nature</button>
+        </div>
+        <button class="btn-quiz-trigger" id="quiz-trigger">🧩 Discover Your Style Quiz</button>
       </div>
 
       <!-- Interactive Map Container -->
@@ -151,6 +154,35 @@
           </div>
         </div>
         <div id="map"></div>
+      </div>
+
+      <!-- Itinerary Builder Container -->
+      <div id="itinerary-wrap" class="itinerary-wrap hidden">
+        <div class="itinerary-header">
+          <div class="itinerary-title-row">
+            <h3>My Travel Itinerary 🗺️</h3>
+            <p>Your custom-designed adventure sequence across Sri Lanka</p>
+          </div>
+          <div class="itinerary-actions">
+            <button class="btn-itinerary-clear" id="itinerary-clear">Clear Itinerary</button>
+            <button class="btn-itinerary-copy" id="itinerary-copy">Copy Plan 📋</button>
+          </div>
+        </div>
+        <div class="itinerary-body">
+          <div class="itinerary-timeline" id="itinerary-timeline">
+            <!-- Dynamic timeline elements are injected via script.js -->
+          </div>
+          <div class="itinerary-summary" id="itinerary-summary">
+            <div class="summary-stat">
+              <span class="stat-lbl">Destinations Selected</span>
+              <span class="stat-val" id="itinerary-count">0</span>
+            </div>
+            <div class="summary-stat">
+              <span class="stat-lbl">Estimated Road Distance</span>
+              <span class="stat-val" id="itinerary-distance">0 km</span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="places-grid" id="places-grid">
@@ -461,31 +493,88 @@
   <section class="tips-section">
     <div class="container">
       <div class="section-tag">Plan Your Trip</div>
-      <h2 class="section-title">Essential Travel Tips</h2>
-      <div class="tips-grid">
-        <div class="tip-card" id="tip-besttime">
-          <div class="tip-icon">📅</div>
-          <h3>Best Time to Visit</h3>
-          <p>December to March for the west and south coasts. May to September for the east coast. Year-round for the
-            cultural triangle.</p>
+      <h2 class="section-title">Essential Travel Tips & Planner</h2>
+      
+      <div class="tips-wrapper">
+        <div class="tips-left-col">
+          <div class="tips-grid">
+            <div class="tip-card" id="tip-besttime">
+              <div class="tip-icon">📅</div>
+              <h3>Best Time to Visit</h3>
+              <p>December to March for the west and south coasts. May to September for the east coast. Year-round for the
+                cultural triangle.</p>
+            </div>
+            <div class="tip-card" id="tip-currency">
+              <div class="tip-icon">💰</div>
+              <h3>Currency</h3>
+              <p>Sri Lankan Rupee (LKR). ATMs are widely available in cities. Carry some cash for rural areas and local
+                markets.</p>
+            </div>
+            <div class="tip-card" id="tip-transport">
+              <div class="tip-icon">🚂</div>
+              <h3>Getting Around</h3>
+              <p>The scenic train route from Kandy to Ella is a must-do. Tuk-tuks, buses, and rental vehicles are readily
+                available.</p>
+            </div>
+            <div class="tip-card" id="tip-food">
+              <div class="tip-icon">🍛</div>
+              <h3>Local Cuisine</h3>
+              <p>Try rice and curry, hoppers, kottu roti, and fresh seafood. Sri Lankan food is bold, spicy, and absolutely
+                delicious.</p>
+            </div>
+          </div>
         </div>
-        <div class="tip-card" id="tip-currency">
-          <div class="tip-icon">💰</div>
-          <h3>Currency</h3>
-          <p>Sri Lankan Rupee (LKR). ATMs are widely available in cities. Carry some cash for rural areas and local
-            markets.</p>
-        </div>
-        <div class="tip-card" id="tip-transport">
-          <div class="tip-icon">🚂</div>
-          <h3>Getting Around</h3>
-          <p>The scenic train route from Kandy to Ella is a must-do. Tuk-tuks, buses, and rental vehicles are readily
-            available.</p>
-        </div>
-        <div class="tip-card" id="tip-food">
-          <div class="tip-icon">🍛</div>
-          <h3>Local Cuisine</h3>
-          <p>Try rice and curry, hoppers, kottu roti, and fresh seafood. Sri Lankan food is bold, spicy, and absolutely
-            delicious.</p>
+
+        <div class="tips-right-col">
+          <div class="converter-card" id="converter-card">
+            <div class="converter-header">
+              <div class="converter-icon">💱</div>
+              <h3>Live Exchange Rates</h3>
+            </div>
+            <p class="converter-desc">Convert foreign currencies dynamically into Sri Lankan Rupees (LKR) using live feeds.</p>
+            
+            <div class="converter-body">
+              <div class="conv-group">
+                <label for="conv-amount">Amount</label>
+                <input type="number" id="conv-amount" value="1" min="0" placeholder="Enter amount..." />
+              </div>
+              
+              <div class="conv-row">
+                <div class="conv-group">
+                  <label for="conv-from">From</label>
+                  <select id="conv-from">
+                    <option value="USD" selected>USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                    <option value="GBP">GBP (£)</option>
+                    <option value="AUD">AUD (A$)</option>
+                    <option value="JPY">JPY (¥)</option>
+                    <option value="INR">INR (₹)</option>
+                    <option value="LKR">LKR (Rs)</option>
+                  </select>
+                </div>
+                
+                <button type="button" class="btn-conv-swap" id="conv-swap" aria-label="Swap Currencies">⇄</button>
+                
+                <div class="conv-group">
+                  <label for="conv-to">To</label>
+                  <select id="conv-to">
+                    <option value="LKR" selected>LKR (Rs)</option>
+                    <option value="USD">USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                    <option value="GBP">GBP (£)</option>
+                    <option value="AUD">AUD (A$)</option>
+                    <option value="JPY">JPY (¥)</option>
+                    <option value="INR">INR (₹)</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="conv-result-box">
+                <div class="conv-result" id="conv-result">-- LKR</div>
+                <div class="conv-rate" id="conv-rate">Loading live rates...</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -627,6 +716,74 @@
       </div>
     </div>
   </footer>
+
+  <!-- ===== TRAVEL STYLE QUIZ MODAL ===== -->
+  <div class="quiz-modal" id="quiz-modal">
+    <div class="quiz-modal-content">
+      <button class="quiz-modal-close" id="quiz-modal-close">&times;</button>
+      <div class="quiz-progress-bar">
+        <div class="quiz-progress" id="quiz-progress"></div>
+      </div>
+      
+      <div class="quiz-screen active" id="quiz-screen-start">
+        <div class="quiz-icon-large">🌴</div>
+        <h2>Discover Your Sri Lanka Travel Style</h2>
+        <p>Take our quick, fun quiz to find the perfect destinations curated for your travel personality!</p>
+        <button class="btn-primary" id="btn-quiz-start">Start Travel Quiz ➔</button>
+      </div>
+
+      <div class="quiz-screen" id="quiz-screen-q1" data-question="1">
+        <span class="quiz-q-num">Question 1 of 4</span>
+        <h3>What is your absolute ideal vacation morning?</h3>
+        <div class="quiz-options">
+          <button class="quiz-opt-btn" data-value="historical">🏛️ Exploring 2,000-year-old palace ruins and temples</button>
+          <button class="quiz-opt-btn" data-value="nature">🏔️ Hiking up misty mountain trails through tea plantations</button>
+          <button class="quiz-opt-btn" data-value="beach">🏖️ Sleeping in and waking up to the sound of ocean waves</button>
+        </div>
+      </div>
+
+      <div class="quiz-screen" id="quiz-screen-q2" data-question="2">
+        <span class="quiz-q-num">Question 2 of 4</span>
+        <h3>Which animal would you be most thrilled to encounter?</h3>
+        <div class="quiz-options">
+          <button class="quiz-opt-btn" data-value="nature">🐆 A wild leopard prowling through dense safari forests</button>
+          <button class="quiz-opt-btn" data-value="historical">🐘 Royal elephants participating in a majestic sacred festival</button>
+          <button class="quiz-opt-btn" data-value="beach">🐋 Giant blue whales breaching in the deep turquoise ocean</button>
+        </div>
+      </div>
+
+      <div class="quiz-screen" id="quiz-screen-q3" data-question="3">
+        <span class="quiz-q-num">Question 3 of 4</span>
+        <h3>Pick your favorite kind of souvenir or memory:</h3>
+        <div class="quiz-options">
+          <button class="quiz-opt-btn" data-value="historical">🖼️ Learning the stories behind deep-seated history and culture</button>
+          <button class="quiz-opt-btn" data-value="nature">🍵 Hand-picking and tasting pure Ceylon tea at the source</button>
+          <button class="quiz-opt-btn" data-value="beach">🏄 Catching waves and relaxing on a hammock under palm trees</button>
+        </div>
+      </div>
+
+      <div class="quiz-screen" id="quiz-screen-q4" data-question="4">
+        <span class="quiz-q-num">Question 4 of 4</span>
+        <h3>How would you describe your travel vibe?</h3>
+        <div class="quiz-options">
+          <button class="quiz-opt-btn" data-value="historical">🏛️ Intellectual, cultural, and spiritual exploration</button>
+          <button class="quiz-opt-btn" data-value="nature">🏔️ Active, adventurous, and close to wild nature</button>
+          <button class="quiz-opt-btn" data-value="beach">🌴 Laid-back, sun-soaked, and totally relaxed</button>
+        </div>
+      </div>
+
+      <div class="quiz-screen" id="quiz-screen-result">
+        <div class="quiz-icon-large" id="quiz-result-icon">✨</div>
+        <span class="quiz-q-num">Your Result</span>
+        <h2 id="quiz-result-title">Calculating...</h2>
+        <p id="quiz-result-desc">Determining your travel profile...</p>
+        <div class="quiz-result-actions">
+          <button class="btn-primary" id="btn-quiz-apply">Show My Recommended Places 📍</button>
+          <button class="btn-secondary" id="btn-quiz-retry">Try Again ↺</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>

@@ -7,6 +7,9 @@ Experience the magic of the Pearl of the Indian Ocean. This project is a stunnin
 ## ✨ Key Features
 - **Premium Design**: Modern, clean, and interactive UI with a focus on immersive imagery.
 - **Fully Responsive**: Works perfectly on mobile, tablet, and desktop devices.
+- **Interactive Itinerary Builder 🧩**: Dynamically add places to a horizontal scrollable timeline stop-by-stop. It calculates total route count, estimated road driving distance (using Haversine + road correction factors), and draws dynamic dashed polyline vectors on the Leaflet map.
+- **Real-time Exchange Rate Converter 💸**: Embedded converter inside the tips section that fetches live currency rates from the Open ER Rates API to perform bidirectional conversions between international currencies (USD, EUR, GBP, AUD, JPY, INR) and Sri Lankan Rupees (LKR) with swap capability.
+- **Travel Style Personality Quiz 🔮**: A multi-screen glassmorphic interactive modal quiz that maps answers to historical, nature, or beach travel categories. It computes your travel profile, filters matching destinations, highlights place cards with a gorgeous glowing cyan pulsing animation, and focuses/bounds the Leaflet map around the matching coordinates!
 - **Dynamic Filtering**: Interactive "Must-Visit Places" section with category filtering.
 - **Photo Gallery**: Specialized grid displaying breathtaking captures of Sri Lanka.
 - **Interactive Elements**: Glassmorphism effects, scroll-reveal animations, and custom lightboxes.
