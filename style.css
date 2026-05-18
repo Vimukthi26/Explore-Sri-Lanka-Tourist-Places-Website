@@ -562,6 +562,7 @@ ul { list-style: none; }
 /* Premium Radium-Themed Marker Popup Styling */
 .leaflet-popup-content-wrapper {
   background: rgba(10, 15, 25, 0.9) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
   backdrop-filter: blur(12px) !important;
   color: #e0f7fa !important;
   border-radius: 12px !important;
@@ -1494,6 +1495,7 @@ ul { list-style: none; }
   line-height: 1.5;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -1935,8 +1937,8 @@ ul { list-style: none; }
    ===================================================== */
 .leaflet-control-layers {
   background: rgba(20, 20, 20, 0.8) !important;
-  backdrop-filter: blur(12px) !important;
   -webkit-backdrop-filter: blur(12px) !important;
+  backdrop-filter: blur(12px) !important;
   border: 1px solid rgba(0, 255, 255, 0.25) !important;
   border-radius: 12px !important;
   color: #ffffff !important;
@@ -1999,8 +2001,8 @@ ul { list-style: none; }
   font-size: 0.88rem !important;
   outline: none !important;
   transition: all 0.3s ease !important;
-  backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
 }
 
@@ -2028,8 +2030,8 @@ ul { list-style: none; }
   left: 0;
   right: 0;
   background: rgba(20, 20, 25, 0.98) !important;
-  backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
   border: 1px solid rgba(0, 255, 255, 0.3) !important;
   border-radius: var(--radius-md) !important;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.65) !important;
