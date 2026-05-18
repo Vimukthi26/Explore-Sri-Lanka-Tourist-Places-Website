@@ -316,8 +316,8 @@
       subdomains: 'abcd'
     });
 
-    // Set default base map
-    darkTheme.addTo(mainMap);
+    // Set default base map (Original green street map as default on load)
+    streetMap.addTo(mainMap);
 
     // Group maps for interactive layer switching
     const baseMaps = {
@@ -348,7 +348,7 @@
     ];
 
     locations.forEach(loc => {
-      const marker = L.marker(loc.coords).addTo(mainMap);
+      const marker = L.marker(loc.coords);
       marker.bindPopup(`<strong>${loc.name}</strong><br>${loc.category.charAt(0).toUpperCase() + loc.category.slice(1)}`);
       mapMarkers[loc.id] = marker;
     });
@@ -468,6 +468,9 @@
   window.focusPlace = (id) => {
     const marker = mapMarkers[id];
     if (marker && mainMap) {
+      if (!mainMap.hasLayer(marker)) {
+        marker.addTo(mainMap);
+      }
       mainMap.setView(marker.getLatLng(), 13);
       marker.openPopup();
       document.getElementById('map-wrap').scrollIntoView({ behavior: 'smooth' });
@@ -652,6 +655,12 @@
       if (!dest) return;
 
       latlngs.push([dest.lat, dest.lon]);
+
+      // Dynamically add marker to map if not already present
+      const marker = mapMarkers[id];
+      if (marker && !mainMap.hasLayer(marker)) {
+        marker.addTo(mainMap);
+      }
 
       // Create timeline element stop card
       const itemCard = document.createElement('div');
