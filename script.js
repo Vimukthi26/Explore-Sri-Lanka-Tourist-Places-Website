@@ -679,7 +679,7 @@
   function copyItineraryToClipboard() {
     if (selectedItinerary.length === 0) return;
 
-    let text = `🇱🇰 EXPLORE SRI LANKA - MY TRAVEL ITINERARY 🗺️\n\n`;
+    let text = `🇱🇰 BEAUTIFUL SRI LANKA - MY TRAVEL ITINERARY 🗺️\n\n`;
     text += `Your scheduled adventure route sequence in paradise:\n`;
     text += `========================================================\n`;
 
