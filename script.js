@@ -304,6 +304,19 @@
       attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
     });
 
+    // Define premium direct Google Maps tile servers
+    const googleStreets = L.tileLayer('https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}', {
+      maxZoom: 20,
+      subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+      attribution: '&copy; <a href="https://www.google.com/maps">Google Maps</a>'
+    });
+
+    const googleHybrid = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+      maxZoom: 20,
+      subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+      attribution: '&copy; <a href="https://www.google.com/maps">Google Maps</a>'
+    });
+
     // Define interactive overlays
     const railOverlay = L.tileLayer('https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png', {
       maxZoom: 19,
@@ -316,11 +329,13 @@
       subdomains: 'abcd'
     });
 
-    // Set default base map (Original green street map as default on load)
-    streetMap.addTo(mainMap);
+    // Set default base map (Google Streets Map as default on load)
+    googleStreets.addTo(mainMap);
 
     // Group maps for interactive layer switching
     const baseMaps = {
+      "Google Maps (Roads) 🗺️": googleStreets,
+      "Google Maps (Satellite Hybrid) 🛰️": googleHybrid,
       "Sleek Dark Map 🖤": darkTheme,
       "Standard Street Map (Original) 🗺️": streetMap,
       "Latest Satellite Map 🛰️": satelliteMap,
