@@ -358,124 +358,12 @@
       { id: 'anuradhapura', name: 'Anuradhapura', coords: [8.3122, 80.4131], category: 'historical' },
       { id: 'yala', name: 'Yala National Park', coords: [6.3981, 81.3323], category: 'nature' }
     ];
-
     locations.forEach(loc => {
       const marker = L.marker(loc.coords);
       marker.bindPopup(`<strong>${loc.name}</strong><br>${loc.category.charAt(0).toUpperCase() + loc.category.slice(1)}`);
       mapMarkers[loc.id] = marker;
     });
-
-    // Safe geocoder wrapper using Photon API (bypasses local CORS issues while remaining highly accurate)
-    const baseGeocoder = L.Control.Geocoder.photon();
-
-    const sriLankaGeocoder = {
-      geocode: function(query, cb, context) {
-        const q = query.toLowerCase().includes('sri lanka') ? query : query + " Sri Lanka";
-        baseGeocoder.geocode(q, cb, context);
-      },
-      suggest: function(query, cb, context) {
-        const q = query.toLowerCase().includes('sri lanka') ? query : query + " Sri Lanka";
-        if (baseGeocoder.suggest) {
-          baseGeocoder.suggest(q, cb, context);
-        } else {
-          baseGeocoder.geocode(q, cb, context);
-        }
-      },
-      reverse: function(location, scale, cb, context) {
-        if (baseGeocoder.reverse) {
-          baseGeocoder.reverse(location, scale, cb, context);
-        }
-      }
-    };
-
-    const geocoderControl = L.Control.geocoder({
-      defaultMarkGeocode: false, // We'll handle it manually for cooler effects
-      placeholder: "Search tourism & sacred places...",
-      geocoder: sriLankaGeocoder
-    }).addTo(mainMap);
-
-    // Group for suggestion markers so we can clear them easily
-    const suggestionGroup = L.layerGroup().addTo(mainMap);
-
-    geocoderControl.on('markgeocode', function(e) {
-      const center = e.geocode.center;
-      const name = e.geocode.name;
-      
-      // Clear previous suggestions
-      suggestionGroup.clearLayers();
-      
-      // Center and add main result marker
-      mainMap.setView(center, 14);
-      L.marker(center)
-        .addTo(suggestionGroup)
-        .bindPopup(`<strong>${name}</strong><br>Search Result`)
-        .openPopup();
-
-      // Fetch nearby suggestions (within 5km)
-      fetchNearbySuggestions(center.lat, center.lng, suggestionGroup);
-    });
   };
-
-  /**
-   * Fetches nearby tourist and religious sites using Overpass API
-   */
-  async function fetchNearbySuggestions(lat, lon, layerGroup) {
-    console.log(`Fetching nearby attractions for ${lat}, ${lon}...`);
-    
-    // Overpass API Query: find tourism or places of worship within 5000m
-    const query = `[out:json];
-      (
-        node(around:5000, ${lat}, ${lon})["tourism"];
-        node(around:5000, ${lat}, ${lon})["amenity"="place_of_worship"];
-        way(around:5000, ${lat}, ${lon})["tourism"];
-        way(around:5000, ${lat}, ${lon})["amenity"="place_of_worship"];
-      );
-      out center;`;
-    
-    const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
-
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-      
-      if (!data.elements || data.elements.length === 0) return;
-
-      // Filter and limit results
-      const results = data.elements
-        .filter(el => el.tags && (el.tags.name)) // Must have a name
-        .slice(0, 8); // Max 8 suggestions
-
-      results.forEach(item => {
-        const itemLat = item.lat || (item.center && item.center.lat);
-        const itemLon = item.lon || (item.center && item.center.lon);
-        const itemName = item.tags.name;
-        const itemType = item.tags.tourism || item.tags.amenity || 'Point of Interest';
-
-        if (itemLat && itemLon) {
-          // Add a special "Suggestion" marker
-          const suggestionMarker = L.circleMarker([itemLat, itemLon], {
-            radius: 8,
-            fillColor: "#00ffff",
-            color: "#fff",
-            weight: 2,
-            opacity: 1,
-            fillOpacity: 0.8
-          }).addTo(layerGroup);
-
-          suggestionMarker.bindPopup(`
-            <div style="text-align: center;">
-              <small style="color: #00ffff; text-transform: uppercase; font-weight: 700;">Suggested Place</small>
-              <h4 style="margin: 5px 0; color: #fff; font-family: var(--font-display);">${itemName}</h4>
-              <p style="margin: 0; font-size: 0.8rem; color: #aaa;">${itemType.replace('_', ' ')}</p>
-            </div>
-          `);
-        }
-      });
-    } catch (error) {
-      console.error("Error fetching nearby suggestions:", error);
-    }
-  }
-
   // Helper to focus map on a specific place
   window.focusPlace = (id) => {
     const marker = mapMarkers[id];
