@@ -679,13 +679,17 @@
   // ---- Currency Converter Widget Integration ----
   async function initCurrencyConverter() {
     const amtInput = document.getElementById('conv-amount');
-    const fromSelect = document.getElementById('conv-from');
-    const toSelect = document.getElementById('conv-to');
+    const fromTrigger = document.getElementById('custom-from-trigger');
+    const toTrigger = document.getElementById('custom-to-trigger');
+    const fromOptions = document.getElementById('custom-from-options');
+    const toOptions = document.getElementById('custom-to-options');
+    const fromSearch = document.querySelector('#custom-from-wrapper .custom-select-search');
+    const toSearch = document.querySelector('#custom-to-wrapper .custom-select-search');
     const resEl = document.getElementById('conv-result');
     const rtEl = document.getElementById('conv-rate');
     const swBtn = document.getElementById('conv-swap');
 
-    if (!amtInput || !fromSelect || !toSelect || !resEl || !rtEl) return;
+    if (!amtInput || !fromTrigger || !toTrigger || !fromOptions || !toOptions || !resEl || !rtEl) return;
 
     // Rich Dictionary containing currency codes, details, names, and flag emojis
     const currencyDetails = {
@@ -723,34 +727,134 @@
       TRY: { name: 'TRY - Turkish Lira 🇹🇷', symbol: '₺' }
     };
 
+    // Trigger buttons open/close toggles
+    fromTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('custom-to-wrapper').classList.remove('open');
+      document.getElementById('custom-from-wrapper').classList.toggle('open');
+      if (fromSearch) {
+        fromSearch.value = '';
+        filterOptions(fromOptions, '');
+        fromSearch.focus();
+      }
+    });
+
+    toTrigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      document.getElementById('custom-from-wrapper').classList.remove('open');
+      document.getElementById('custom-to-wrapper').classList.toggle('open');
+      if (toSearch) {
+        toSearch.value = '';
+        filterOptions(toOptions, '');
+        toSearch.focus();
+      }
+    });
+
+    // Close dropdowns on clicking outside
+    document.addEventListener('click', () => {
+      document.getElementById('custom-from-wrapper').classList.remove('open');
+      document.getElementById('custom-to-wrapper').classList.remove('open');
+    });
+
+    // Stop propagation inside dropdowns so it doesn't close when typing or clicking options container
+    document.querySelectorAll('.custom-select-dropdown').forEach(dp => {
+      dp.addEventListener('click', (e) => e.stopPropagation());
+    });
+
+    // Search filter helper
+    if (fromSearch) {
+      fromSearch.addEventListener('input', (e) => {
+        filterOptions(fromOptions, e.target.value);
+      });
+    }
+
+    if (toSearch) {
+      toSearch.addEventListener('input', (e) => {
+        filterOptions(toOptions, e.target.value);
+      });
+    }
+
+    function filterOptions(container, val) {
+      const q = val.trim().toLowerCase();
+      const options = container.querySelectorAll('.custom-option');
+      options.forEach(opt => {
+        if (opt.textContent.toLowerCase().includes(q)) {
+          opt.style.display = 'block';
+        } else {
+          opt.style.display = 'none';
+        }
+      });
+    }
+
     // Helper to populate select elements dynamically
     function populateDropdowns(rates) {
-      // Keep track of current values to restore them
-      const prevFrom = fromSelect.value || 'USD';
-      const prevTo = toSelect.value || 'LKR';
+      const prevFrom = fromTrigger.getAttribute('data-value') || 'USD';
+      const prevTo = toTrigger.getAttribute('data-value') || 'LKR';
 
-      fromSelect.innerHTML = '';
-      toSelect.innerHTML = '';
+      fromOptions.innerHTML = '';
+      toOptions.innerHTML = '';
 
       const codes = Object.keys(rates).sort();
 
       codes.forEach(code => {
         const details = currencyDetails[code] || { name: `${code} - ${code} 🌍`, symbol: code };
         
-        const optFrom = document.createElement('option');
-        optFrom.value = code;
+        // Option for FROM dropdown
+        const optFrom = document.createElement('div');
+        optFrom.className = 'custom-option';
+        if (code === prevFrom) optFrom.classList.add('selected');
+        optFrom.setAttribute('data-value', code);
         optFrom.textContent = details.name;
-        fromSelect.appendChild(optFrom);
+        optFrom.addEventListener('click', () => {
+          selectValue('from', code, details.name);
+        });
+        fromOptions.appendChild(optFrom);
 
-        const optTo = document.createElement('option');
-        optTo.value = code;
+        // Option for TO dropdown
+        const optTo = document.createElement('div');
+        optTo.className = 'custom-option';
+        if (code === prevTo) optTo.classList.add('selected');
+        optTo.setAttribute('data-value', code);
         optTo.textContent = details.name;
-        toSelect.appendChild(optTo);
+        optTo.addEventListener('click', () => {
+          selectValue('to', code, details.name);
+        });
+        toOptions.appendChild(optTo);
       });
 
-      // Restore selections safely
-      fromSelect.value = rates[prevFrom] ? prevFrom : 'USD';
-      toSelect.value = rates[prevTo] ? prevTo : 'LKR';
+      // Update trigger visual representations
+      updateTriggerVisual('from', prevFrom);
+      updateTriggerVisual('to', prevTo);
+    }
+
+    function selectValue(type, val, text) {
+      const trigger = type === 'from' ? fromTrigger : toTrigger;
+      const container = type === 'from' ? fromOptions : toOptions;
+      const wrapper = type === 'from' ? document.getElementById('custom-from-wrapper') : document.getElementById('custom-to-wrapper');
+
+      // Update value
+      trigger.setAttribute('data-value', val);
+      trigger.textContent = text;
+
+      // Update active selection classes
+      container.querySelectorAll('.custom-option').forEach(opt => {
+        if (opt.getAttribute('data-value') === val) {
+          opt.classList.add('selected');
+        } else {
+          opt.classList.remove('selected');
+        }
+      });
+
+      // Close dropdown
+      wrapper.classList.remove('open');
+      performConversion();
+    }
+
+    function updateTriggerVisual(type, code) {
+      const trigger = type === 'from' ? fromTrigger : toTrigger;
+      const details = currencyDetails[code] || { name: `${code} - ${code} 🌍`, symbol: code };
+      trigger.setAttribute('data-value', code);
+      trigger.textContent = details.name;
     }
 
     // Fetch dynamic rates
@@ -782,23 +886,24 @@
     }
 
     amtInput.addEventListener('input', performConversion);
-    fromSelect.addEventListener('change', performConversion);
-    toSelect.addEventListener('change', performConversion);
 
     if (swBtn) {
       swBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        const temp = fromSelect.value;
-        fromSelect.value = toSelect.value;
-        toSelect.value = temp;
-        performConversion();
+        const fromVal = fromTrigger.getAttribute('data-value');
+        const fromText = fromTrigger.textContent;
+        const toVal = toTrigger.getAttribute('data-value');
+        const toText = toTrigger.textContent;
+
+        selectValue('from', toVal, toText);
+        selectValue('to', fromVal, fromText);
       });
     }
 
     function performConversion() {
       const amt = parseFloat(amtInput.value);
-      const toCur = toSelect.value;
-      const fromCur = fromSelect.value;
+      const fromCur = fromTrigger.getAttribute('data-value');
+      const toCur = toTrigger.getAttribute('data-value');
 
       if (isNaN(amt) || amt <= 0) {
         resEl.textContent = `-- ${toCur}`;

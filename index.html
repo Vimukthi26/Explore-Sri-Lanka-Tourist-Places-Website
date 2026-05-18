@@ -545,32 +545,32 @@
               </div>
               
               <div class="conv-row">
-                <div class="conv-group">
-                  <label for="conv-from">From</label>
-                  <select id="conv-from">
-                    <option value="USD" selected>USD ($)</option>
-                    <option value="EUR">EUR (€)</option>
-                    <option value="GBP">GBP (£)</option>
-                    <option value="AUD">AUD (A$)</option>
-                    <option value="JPY">JPY (¥)</option>
-                    <option value="INR">INR (₹)</option>
-                    <option value="LKR">LKR (Rs)</option>
-                  </select>
+                <div class="conv-group custom-select-group">
+                  <label>From</label>
+                  <div class="custom-select-wrapper" id="custom-from-wrapper">
+                    <button type="button" class="custom-select-trigger" id="custom-from-trigger" data-value="USD">USD - US Dollar 🇺🇸</button>
+                    <div class="custom-select-dropdown">
+                      <input type="text" class="custom-select-search" placeholder="Search country..." />
+                      <div class="custom-select-options" id="custom-from-options">
+                        <!-- Populated dynamically -->
+                      </div>
+                    </div>
+                  </div>
                 </div>
                 
                 <button type="button" class="btn-conv-swap" id="conv-swap" aria-label="Swap Currencies">⇄</button>
                 
-                <div class="conv-group">
-                  <label for="conv-to">To</label>
-                  <select id="conv-to">
-                    <option value="LKR" selected>LKR (Rs)</option>
-                    <option value="USD">USD ($)</option>
-                    <option value="EUR">EUR (€)</option>
-                    <option value="GBP">GBP (£)</option>
-                    <option value="AUD">AUD (A$)</option>
-                    <option value="JPY">JPY (¥)</option>
-                    <option value="INR">INR (₹)</option>
-                  </select>
+                <div class="conv-group custom-select-group">
+                  <label>To</label>
+                  <div class="custom-select-wrapper" id="custom-to-wrapper">
+                    <button type="button" class="custom-select-trigger" id="custom-to-trigger" data-value="LKR">LKR - Sri Lankan Rupee 🇱🇰</button>
+                    <div class="custom-select-dropdown">
+                      <input type="text" class="custom-select-search" placeholder="Search country..." />
+                      <div class="custom-select-options" id="custom-to-options">
+                        <!-- Populated dynamically -->
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
               
