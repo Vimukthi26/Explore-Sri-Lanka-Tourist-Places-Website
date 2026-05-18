@@ -282,12 +282,58 @@
     mainMap.on('click', () => mainMap.scrollWheelZoom.enable());
     mainMap.on('mouseout', () => mainMap.scrollWheelZoom.disable());
 
-    // Premium Dark themed map tiles (matched to site aesthetic)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    // Define premium multi-layer map sources to support complete district, road, temple, and river views
+    const darkTheme = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       maxZoom: 19,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
       subdomains: 'abcd'
-    }).addTo(mainMap);
+    });
+
+    const streetMap = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    });
+
+    const satelliteMap = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19,
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    });
+
+    const topoMap = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+      maxZoom: 17,
+      attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+    });
+
+    // Define interactive overlays
+    const railOverlay = L.tileLayer('https://{s}.tiles.openrailwaymap.org/standard/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: 'Style: &copy; <a href="https://www.OpenRailwayMap.org">OpenRailwayMap</a> | Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    });
+
+    const labelOverlay = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_only_labels/{z}/{x}/{y}{r}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>',
+      subdomains: 'abcd'
+    });
+
+    // Set default base map
+    darkTheme.addTo(mainMap);
+
+    // Group maps for interactive layer switching
+    const baseMaps = {
+      "Sleek Dark Map 🖤": darkTheme,
+      "Standard Street Map (Original) 🗺️": streetMap,
+      "Latest Satellite Map 🛰️": satelliteMap,
+      "Topographic Terrain Map 🏔️": topoMap
+    };
+
+    const overlayMaps = {
+      "Railway Network Overlay 🚂": railOverlay,
+      "Roads & Places Labels Overlay 🏷️": labelOverlay
+    };
+
+    // Add Layer Control Panel to map (non-collapsed, perfectly accessible)
+    L.control.layers(baseMaps, overlayMaps, { collapsed: false, position: 'topright' }).addTo(mainMap);
 
     // Filter markers from places cards
     const locations = [

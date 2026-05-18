@@ -1926,3 +1926,53 @@ ul { list-style: none; }
     width: 100%;
   }
 }
+
+/* =====================================================
+   Premium Leaflet Layers Control Styling
+   ===================================================== */
+.leaflet-control-layers {
+  background: rgba(20, 20, 20, 0.8) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(0, 255, 255, 0.25) !important;
+  border-radius: 12px !important;
+  color: #ffffff !important;
+  font-family: var(--font-body), sans-serif !important;
+  font-size: 0.85rem !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 255, 255, 0.12) !important;
+  padding: 10px 14px !important;
+  transition: all 0.3s ease !important;
+}
+
+.leaflet-control-layers:hover {
+  border-color: rgba(0, 255, 255, 0.5) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 255, 255, 0.2) !important;
+}
+
+.leaflet-control-layers-list label {
+  margin: 5px 0 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  font-weight: 500 !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+  transition: color 0.2s ease !important;
+}
+
+.leaflet-control-layers-list label:hover {
+  color: #00ffff !important;
+}
+
+.leaflet-control-layers-separator {
+  border-top: 1px solid rgba(0, 255, 255, 0.15) !important;
+  margin: 8px 0 !important;
+}
+
+.leaflet-control-layers input[type="radio"],
+.leaflet-control-layers input[type="checkbox"] {
+  accent-color: #00ffff !important;
+  cursor: pointer !important;
+  margin-right: 8px !important;
+  width: 14px !important;
+  height: 14px !important;
+}
